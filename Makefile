@@ -13,40 +13,30 @@ IMAGE_NAME ?= postgresql-ivm
 IMAGE_TAG := $(PG_VER)-$(POSTGIS_VER)-$(BASE_OS)
 REGISTRY_IMAGE_PREFIX ?= anonymouz
 
-# Detect architecture for local builds
-ARCH := $(shell uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+# Architecture variable for GHA (e.g., linux/amd64)
+# Defaults to local architecture if not provided
+TARGET_PLATFORM ?= linux/$(shell uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 
 .PHONY: all build-load export-deb test clean mirror
 
-all: mirror build-load export-deb test
+all: build-load export-deb test
 
-# Mirror the base image to the local registry
-mirror:
-	@echo "🪞 Mirroring base image: postgres:$(PG_VER)-$(BASE_OS)..."
-	@if ! docker buildx inspect multi-builder > /dev/null 2>&1; then \
-		docker buildx create --name multi-builder --driver docker-container --use; \
-	fi
-	@echo "FROM postgres:$(PG_VER)-$(BASE_OS)" | docker buildx build --builder multi-builder \
-		--platform linux/amd64,linux/arm64 \
-		-t $(REGISTRY_IMAGE_PREFIX)/postgres:$(PG_VER)-$(BASE_OS) \
-		--push -
-
+# Export .deb packages: honors TARGET_PLATFORM for multi-arch builds
 export-deb:
-	@echo "📤 Extracting .deb packages for $(BASE_OS) to ./dist..."
+	@echo "📤 Extracting .deb packages for $(BASE_OS) ($(TARGET_PLATFORM)) to ./dist..."
 	@mkdir -p $(CURDIR)/dist
-	# We target the 'exporter' stage and tell buildx to output to a local directory
-	docker buildx build --platform linux/$(ARCH) \
+	docker buildx build --platform $(TARGET_PLATFORM) \
 		--target exporter \
 		--build-arg BASE_OS=$(BASE_OS) \
 		--build-arg BUILD_ID=$(BUILD_ID) \
 		--output type=local,dest=$(CURDIR)/dist \
 		.
-	@echo "✅ Artifacts exported to $(CURDIR)/dist/:"
-	@ls -lh $(CURDIR)/dist/*.deb || echo "❌ No files found in $(CURDIR)/dist/"
+	@echo "✅ Artifacts exported to $(CURDIR)/dist/"
 
+# Build and load image to the local Docker daemon (host architecture only)
 build-load:
-	@echo "📦 Building $(IMAGE_NAME):$(IMAGE_TAG) for architecture $(ARCH)..."
-	docker buildx build --platform linux/$(ARCH) --load \
+	@echo "📦 Building $(IMAGE_NAME):$(IMAGE_TAG) for $(TARGET_PLATFORM) and loading to local docker..."
+	docker buildx build --platform $(TARGET_PLATFORM) --load \
 		--build-arg BASE_OS=$(BASE_OS) \
 		$(BUILD_ARGS) \
 		-t $(IMAGE_NAME):$(IMAGE_TAG) .
@@ -57,7 +47,7 @@ test:
 	@docker run -d --name pg-test-run -e POSTGRES_PASSWORD=test $(IMAGE_NAME):$(IMAGE_TAG)
 	@echo "⏳ Waiting for PostgreSQL to be fully ready..."
 	@i=0; while [ $$i -lt 30 ]; do \
-		READY_LOGS=$$(docker logs pg-test-run 2>&1 | grep -c "database system is ready to accept connections"); \
+		READY_LOGS=$$(docker logs pg-test-run 2>&1 | grep -c "database system is ready to accept connections" || true); \
 		if [ $$READY_LOGS -ge 2 ]; then \
 			echo "✅ Server is up!"; \
 			break; \
