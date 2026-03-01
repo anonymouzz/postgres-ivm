@@ -1,0 +1,30 @@
+name: "postgresql-16-pg-ivm"
+arch: "${TARGETARCH}"
+platform: "linux"
+version: "1.13"
+release: "${BUILD_ID}"
+section: "database"
+priority: "optional"
+maintainer: "Anonymouz <anonymouz@example.com>"
+description: |
+  Incremental View Maintenance (IVM) feature for PostgreSQL 16.
+vendor: "IVM Development Group"
+homepage: "https://github.com/sraoss/pg_ivm"
+license: "PostgreSQL"
+
+depends:
+  - postgresql-16
+
+contents:
+  - src: ./tmp_install/usr/lib/postgresql/16/lib/pg_ivm.so
+    dst: /usr/lib/postgresql/16/lib/pg_ivm.so
+
+  - src: ./tmp_install/usr/share/postgresql/16/extension/pg_ivm*
+    dst: /usr/share/postgresql/16/extension/
+
+  - src: ./README.md
+    dst: /usr/share/doc/postgresql-16-pg-ivm/README-pg_ivm.md
+
+  # Removed 'optional: true' to prevent unmarshal errors
+  - src: ./tmp_install/usr/lib/postgresql/16/lib/bitcode/pg_ivm*
+    dst: /usr/lib/postgresql/16/lib/bitcode/
