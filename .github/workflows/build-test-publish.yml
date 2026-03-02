@@ -3,13 +3,18 @@ name: Build, Test and Publish
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - "v*" # Триггер на релизные теги v1.0.0 и т.д.
   pull_request:
     branches: [ "main" ]
 
-jobs:
+permissions:
+  contents: write
+  packages: write
 
+jobs:
   build:
-    name: Build and Test (${{ matrix.base_os }})
+    name: Build and Test (${{ matrix.base_os }} / ${{ matrix.arch }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -25,7 +30,6 @@ jobs:
             is_latest: false
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v6
 
@@ -66,6 +70,7 @@ jobs:
         with:
           name: postgresql-16-pg-ivm-deb-${{ matrix.base_os }}-${{ matrix.arch }}
           path: dist/*.deb
+          retention-days: 5
 
       - name: Build and Push Final Multi-arch Image
         if: matrix.arch == 'amd64'
@@ -79,6 +84,7 @@ jobs:
           tags: |
             ${{ secrets.REGISTRY_IMAGE_PREFIX }}/postgresql-ivm:${{ matrix.tag }}
             ${{ matrix.is_latest && format('{0}/postgresql-ivm:latest', secrets.REGISTRY_IMAGE_PREFIX) || '' }}
+            ${{ startsWith(github.ref, 'refs/tags/v') && format('{0}/postgresql-ivm:{1}-{2}', secrets.REGISTRY_IMAGE_PREFIX, github.ref_name, matrix.base_os) || '' }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
@@ -86,10 +92,10 @@ jobs:
             version.base_os=${{ matrix.base_os }}
 
   publish:
-    name: Create Release
+    name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -102,3 +108,11 @@ jobs:
         with:
           files: release-artifacts/*.deb
           generate_release_notes: true
+          body: |
+            ### PostgreSQL + pg_ivm Infrastructure Release
+            Automated build of PostgreSQL 16 with pg-ivm.
+
+            **OS versions included:** trixie, bullseye.
+            **Architectures:** amd64, arm64.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
