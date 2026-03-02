@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: postgresql-16-pg-ivm-deb-${{ matrix.base_os }}
-          path: postgres/dist/*.deb
+          path: dist/*.deb
 
       - name: Build and Push Final Multi-arch Image
         uses: docker/build-push-action@v6
@@ -69,10 +69,10 @@ jobs:
           build-args: |
             BASE_OS=${{ matrix.base_os }}
           tags: |
-            ${{ vars.REGISTRY_IMAGE_PREFIX }}/postgresql-ivm:${{ matrix.tag }}
-            ${{ matrix.is_latest && format('{0}/postgresql-ivm:latest', vars.REGISTRY_IMAGE_PREFIX) || '' }}
+            ${{ secrets.REGISTRY_IMAGE_PREFIX }}/postgresql-ivm:${{ matrix.tag }}
+            ${{ matrix.is_latest && format('{0}/postgresql-ivm:latest', secrets.REGISTRY_IMAGE_PREFIX) || '' }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.vendor=Yolwise
+            org.opencontainers.image.vendor=anonymouz
             version.base_os=${{ matrix.base_os }}
