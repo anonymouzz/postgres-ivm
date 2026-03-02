@@ -27,15 +27,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ secrets.REGISTRY_IMAGE_PREFIX }}/postgresql-ivm
-          tags: |
-            type=raw,value=${{ matrix.tag_suffix }}
-            type=raw,value=latest,enable=${{ matrix.is_latest }}
-
       - name: Login to Gitea Registry
         uses: docker/login-action@v3
         with:
@@ -77,5 +68,11 @@ jobs:
           push: true
           build-args: |
             BASE_OS=${{ matrix.base_os }}
-          tags: ${{ id.meta.outputs.tags }}
-          labels: ${{ id.meta.outputs.labels }}
+          tags: |
+            ${{ vars.REGISTRY_IMAGE_PREFIX }}/postgresql-ivm:${{ matrix.tag }}
+            ${{ matrix.is_latest && format('{0}/postgresql-ivm:latest', vars.REGISTRY_IMAGE_PREFIX) || '' }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.vendor=Yolwise
+            version.base_os=${{ matrix.base_os }}
