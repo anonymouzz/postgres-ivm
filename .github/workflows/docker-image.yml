@@ -42,7 +42,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and Export DEB packages
-        run: make -C postgres export-deb BASE_OS=${{ matrix.base_os }} BUILD_ID=${{ github.run_id }}
+        run: make clean export-deb BASE_OS=${{ matrix.base_os }} BUILD_ID=${{ github.run_id }}
 
       - name: Build Local for Testing
         run: |
