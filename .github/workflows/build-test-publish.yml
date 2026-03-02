@@ -64,7 +64,7 @@ jobs:
       - name: Upload DEB Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: postgresql-16-pg-ivm-deb-${{ matrix.base_os }}-{{ matrix.arch }}
+          name: postgresql-16-pg-ivm-deb-${{ matrix.base_os }}-${{ matrix.arch }}
           path: dist/*.deb
 
       - name: Build and Push Final Multi-arch Image
