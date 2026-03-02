@@ -52,7 +52,7 @@ jobs:
             ./postgres
 
       - name: Run Deep Functional Tests
-        run: make -C postgres test IMAGE_TAG=test-latest
+        run: make test IMAGE_TAG=test-latest
 
       - name: Upload DEB Artifacts
         uses: actions/upload-artifact@v4
