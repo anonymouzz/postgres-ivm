@@ -30,7 +30,8 @@ export-deb:
 		--build-arg BASE_OS=$(BASE_OS) \
 		--build-arg BUILD_ID=$(BUILD_ID) \
 		--output type=local,dest=$(CURDIR)/dist \
-		.
+		-f postgres/Dockerfile \
+		postgres
 	@echo "✅ Artifacts exported to $(CURDIR)/dist/"
 
 # Build and load image to the local Docker daemon (host architecture only)
@@ -39,7 +40,8 @@ build-load:
 	docker buildx build --platform $(TARGET_PLATFORM) --load \
 		--build-arg BASE_OS=$(BASE_OS) \
 		$(BUILD_ARGS) \
-		-t $(IMAGE_NAME):$(IMAGE_TAG) .
+		-t $(IMAGE_NAME):$(IMAGE_TAG) \
+		-f postgres/Dockerfile postgres
 
 test:
 	@echo "🧪 Running deep functional tests for $(IMAGE_NAME):$(IMAGE_TAG)..."
