@@ -11,9 +11,13 @@ ARG BUILD_ID
 
 # Install build dependencies with retries to mitigate network flakiness
 RUN apt-get update && \
+    # Install libc-bin may avoid SIGSEGV в QEMU
+    apt-get install -y -o Acquire::Retries=3 --no-install-recommends libc-bin || \
+    (echo "Retrying libc-bin installation due to QEMU flake..." && apt-get install -y --fix-broken) && \
     apt-get install -y -o Acquire::Retries=3 --no-install-recommends \
-    git make build-essential gcc postgresql-server-dev-16 \
-    ca-certificates curl binutils && \
+    ca-certificates curl git binutils && \
+    apt-get install -y -o Acquire::Retries=3 --no-install-recommends \
+    make build-essential gcc postgresql-server-dev-16 \
     rm -rf /var/lib/apt/lists/*
 
 # Install nFPM (Modern Go-based replacement for FPM)
@@ -58,6 +62,9 @@ COPY --from=builder /build/*.deb /tmp/
 
 # Consolidate OS updates, PostGIS installation, and local .deb package deployment
 RUN apt-get update && \
+    # Install libc-bin may avoid SIGSEGV в QEMU
+    apt-get install -y -o Acquire::Retries=3 --no-install-recommends libc-bin || \
+    (echo "Retrying libc-bin installation due to QEMU flake..." && apt-get install -y --fix-broken) && \
     apt-get dist-upgrade -y && \
     apt-get install -y -o Acquire::Retries=3 --no-install-recommends \
     postgresql-16-postgis-3 \

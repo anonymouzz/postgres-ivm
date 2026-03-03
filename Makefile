@@ -1,6 +1,7 @@
 BASE_OS ?= trixie
 PG_VER := 16
 BUILD_ID ?= 1
+ON_GITHUB ?= false
 
 # Define PostGIS version based on the target OS
 ifeq ($(BASE_OS),bullseye)
@@ -17,11 +18,11 @@ REGISTRY_IMAGE_PREFIX ?= anonymouz
 # Defaults to local architecture if not provided
 TARGET_PLATFORM ?= linux/$(shell uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 
-.PHONY: all build-load export-deb test clean mirror
+.PHONY: all build-load export-deb test clean
 
 all: build-load export-deb test
 
-# Export .deb packages: honors TARGET_PLATFORM for multi-arch builds
+# Export .deb packages
 export-deb:
 	@echo "📤 Extracting .deb packages for $(BASE_OS) ($(TARGET_PLATFORM)) to ./dist..."
 	@mkdir -p $(CURDIR)/dist
@@ -29,17 +30,20 @@ export-deb:
 		--target exporter \
 		--build-arg BASE_OS=$(BASE_OS) \
 		--build-arg BUILD_ID=$(BUILD_ID) \
+		--build-arg ON_GITHUB=$(ON_GITHUB) \
 		--output type=local,dest=$(CURDIR)/dist \
 		-f postgres/Dockerfile \
 		postgres
 	@echo "✅ Artifacts exported to $(CURDIR)/dist/"
 
-# Build and load image to the local Docker daemon (host architecture only)
+# Build and load image to the local Docker daemon
 build-load:
 	@echo "📦 Building $(IMAGE_NAME):$(IMAGE_TAG) for $(TARGET_PLATFORM) and loading to local docker..."
 	docker buildx build --platform $(TARGET_PLATFORM) --load \
-		--build-arg BASE_OS=$(BASE_OS) \
 		$(BUILD_ARGS) \
+		--build-arg BASE_OS=$(BASE_OS) \
+		--build-arg BUILD_ID=$(BUILD_ID) \
+		--build-arg ON_GITHUB=$(ON_GITHUB) \
 		-t $(IMAGE_NAME):$(IMAGE_TAG) \
 		-f postgres/Dockerfile postgres
 
