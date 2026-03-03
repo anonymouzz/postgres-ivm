@@ -70,6 +70,7 @@ RUN apt-get update && \
     postgresql-16-postgis-3 \
     postgresql-16-postgis-3-scripts \
     wget gosu &&  \
+    apt-get install -y /tmp/*.deb && \
     rm /tmp/*.deb && \
     rm -rf /var/lib/apt/lists/*
 
