@@ -88,7 +88,6 @@ jobs:
           tags: |
             ${{ secrets.REGISTRY_IMAGE_PREFIX }}/postgresql-ivm:${{ matrix.tag }}
             ${{ matrix.is_latest && format('{0}/postgresql-ivm:latest', secrets.REGISTRY_IMAGE_PREFIX) || '' }}
-            ${{ startsWith(github.ref, 'refs/tags/v') && format('{0}/postgresql-ivm:{1}-{2}', secrets.REGISTRY_IMAGE_PREFIX, github.ref_name, matrix.base_os) || '' }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
