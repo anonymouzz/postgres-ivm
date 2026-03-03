@@ -17,7 +17,7 @@ RUN apt-get update && \
     apt-get install -y -o Acquire::Retries=3 --no-install-recommends \
     ca-certificates curl git binutils && \
     apt-get install -y -o Acquire::Retries=3 --no-install-recommends \
-    make build-essential gcc postgresql-server-dev-16 \
+    make build-essential gcc postgresql-server-dev-16 && \
     rm -rf /var/lib/apt/lists/*
 
 # Install nFPM (Modern Go-based replacement for FPM)
@@ -69,8 +69,7 @@ RUN apt-get update && \
     apt-get install -y -o Acquire::Retries=3 --no-install-recommends \
     postgresql-16-postgis-3 \
     postgresql-16-postgis-3-scripts \
-    wget gosu \
-    /tmp/*.deb && \
+    wget gosu &&  \
     rm /tmp/*.deb && \
     rm -rf /var/lib/apt/lists/*
 
