@@ -70,14 +70,18 @@ jobs:
         with:
           name: postgresql-16-pg-ivm-deb-${{ matrix.base_os }}-${{ matrix.arch }}
           path: dist/*.deb
-          retention-days: 5
+          retention-days: 1
+          if-no-files-found: error
 
       - name: Build and Push Final Multi-arch Image
-        if: matrix.arch == 'amd64'
+        if: matrix.arch == 'amd64' && github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
         with:
           context: ./postgres
           platforms: linux/amd64,linux/arm64
+          provenance: mode=max
+          sbom: true
+          outputs: type=registry
           push: true
           build-args: |
             BASE_OS=${{ matrix.base_os }}
@@ -97,16 +101,29 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - name: Download all artifacts
+      - name: Download DEB artifacts
         uses: actions/download-artifact@v4
         with:
+          pattern: postgresql-16-pg-ivm-deb-*
           path: release-artifacts
           merge-multiple: true
+
+      - name: Check downloaded files
+        run: ls -R release-artifacts/
+
+      - name: Generate Checksums
+        working-directory: release-artifacts
+        run: |
+          sha256sum *.deb > SHA256SUMS
+          echo "### Checksums generated:"
+          cat SHA256SUMS
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release-artifacts/*.deb
+          files: |
+            release-artifacts/*.deb
+            release-artifacts/SHA256SUMS
           generate_release_notes: true
           body: |
             ### PostgreSQL + pg_ivm Infrastructure Release
