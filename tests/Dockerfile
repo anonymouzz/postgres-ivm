@@ -15,7 +15,7 @@ WORKDIR /app
 
 # Clone pg_ivm to get access to regression tests (sql/ and expected/ directories)
 # Using shallow clone for speed
-RUN git clone --depth 1 --branch v1.13 https://github.com/sraoss/pg_ivm.git .
+RUN git clone --depth 1 --branch v1.16 https://github.com/sraoss/pg_ivm.git .
 
 # Point to the correct pg_config and add PG tools to PATH
 ENV PG_CONFIG=/usr/lib/postgresql/16/bin/pg_config

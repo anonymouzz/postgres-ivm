@@ -26,7 +26,7 @@ RUN NFPM_ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "x86_64" || echo "arm64") &&
     tar xz -C /usr/local/bin nfpm
 
 WORKDIR /build
-RUN git clone --depth 1 --branch v1.13 https://github.com/sraoss/pg_ivm.git .
+RUN git clone --depth 1 --branch v1.16 https://github.com/sraoss/pg_ivm.git .
 COPY nfpm.yaml .
 
 # Build extension and verify binary architecture
@@ -86,7 +86,7 @@ LABEL org.opencontainers.image.source="https://github.com/anonymouzz/postgresql-
       org.opencontainers.image.url="https://hub.docker.com/r/anonymouz/postgresql-ivm" \
       org.opencontainers.image.vendor="anonymouz" \
       org.opencontainers.image.licenses="PostgreSQL" \
-      version.pg_ivm="1.13" \
+      version.pg_ivm="1.16" \
       version.postgresql="16"
 
 # Standard PostgreSQL Healthcheck

@@ -1,7 +1,7 @@
 name: "postgresql-16-pg-ivm"
 arch: "${TARGETARCH}"
 platform: "linux"
-version: "1.13"
+version: "1.16"
 release: "${BUILD_ID}"
 section: "database"
 priority: "optional"
