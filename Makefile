@@ -3,12 +3,7 @@ PG_VER := 16
 BUILD_ID ?= 1
 ON_GITHUB ?= false
 
-# Define PostGIS version based on the target OS
-ifeq ($(BASE_OS),bullseye)
-    POSTGIS_VER := 3.5
-else
-    POSTGIS_VER := 3.6
-endif
+POSTGIS_VER := 3.6
 
 IMAGE_NAME ?= postgresql-ivm
 IMAGE_TAG := $(PG_VER)-$(POSTGIS_VER)-$(BASE_OS)

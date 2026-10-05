@@ -19,15 +19,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        base_os: [trixie, bullseye]
+        base_os: [trixie]
         arch: [amd64, arm64]
         include:
           - base_os: trixie
             tag: 16-3.6-trixie
             is_latest: true
-          - base_os: bullseye
-            tag: 16-3.5-bullseye
-            is_latest: false
 
     steps:
       - name: Checkout
@@ -128,7 +125,7 @@ jobs:
             ### PostgreSQL + pg_ivm Infrastructure Release
             Automated build of PostgreSQL 16 with pg-ivm.
 
-            **OS versions included:** trixie, bullseye.
+            **OS versions included:** trixie.
             **Architectures:** amd64, arm64.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

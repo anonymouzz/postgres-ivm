@@ -11,16 +11,15 @@ This image is designed for high-performance applications requiring real-time mat
 ## Features
 
 * **Incremental View Maintenance:** Powered by [pg_ivm](https://github.com/sraoss/pg_ivm), allowing materialized views to be updated instantly when base tables change.
-* **Geospatial Support:** Includes [PostGIS](https://postgis.net/) (3.5/3.6).
+* **Geospatial Support:** Includes [PostGIS](https://postgis.net/) 3.6.
 * **Multi-Arch Support:** Fully compatible with `linux/amd64` and `linux/arm64` (including Raspberry Pi 4).
-* **Production Ready:** Built on Debian (Bullseye/Trixie) with rigorous testing via QEMU and native ARM64 hardware.
+* **Production Ready:** Built on Debian Trixie with rigorous testing via QEMU and native ARM64 hardware.
 
 ## Supported Tags
 
 | PostgreSQL | PostGIS | Base OS | Docker Tag |
 | :--- | :--- | :--- | :--- |
 | 16 | 3.6 | Debian Trixie | `16-3.6-trixie`, `latest` |
-| 16 | 3.5 | Debian Bullseye | `16-3.5-bullseye` |
 
 ## Quick Start
 

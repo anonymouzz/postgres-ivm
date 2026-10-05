@@ -21,7 +21,7 @@ SCRIPT_DIR=$(dirname "$0")
 REGISTRIES="${REGISTRIES:-"docker.io"}"
 CUSTOM_IMAGE_PREFIX="${CUSTOM_IMAGE_PREFIX:-"anonymouz"}"
 # Format: base_os:pg_version:postgis_version
-OS_VERSIONS="${OS_VERSIONS:-"bullseye:16:3.5 trixie:16:3.6"}"
+OS_VERSIONS="${OS_VERSIONS:-"trixie:16:3.6"}"
 
 # Testing parameters
 NET_NAME="pg-test-net"
@@ -62,7 +62,7 @@ for REG in $REGISTRIES; do
     for OS_ENTRY in $OS_VERSIONS; do
         START_ITER=$(date +%s)
 
-        # Parse OS_ENTRY (e.g., bullseye:16:3.5) using 'cut'
+        # Parse OS_ENTRY (e.g., trixie:16:3.6) using 'cut'
         BASE_OS=$(echo "$OS_ENTRY" | cut -d: -f1)
         PG_VER=$(echo "$OS_ENTRY" | cut -d: -f2)
         GIS_VER=$(echo "$OS_ENTRY" | cut -d: -f3)

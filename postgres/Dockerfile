@@ -1,4 +1,4 @@
-# Argument to choose the base OS (trixie or bullseye)
+# Base OS. Only Debian Trixie is built.
 ARG BASE_OS=trixie
 ARG REGISTRY=docker.io
 
