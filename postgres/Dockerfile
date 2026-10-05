@@ -69,7 +69,7 @@ RUN apt-get update && \
     apt-get install -y -o Acquire::Retries=3 --no-install-recommends \
     postgresql-16-postgis-3 \
     postgresql-16-postgis-3-scripts \
-    wget gosu &&  \
+    wget && \
     apt-get install -y /tmp/*.deb && \
     rm /tmp/*.deb && \
     rm -rf /var/lib/apt/lists/*
